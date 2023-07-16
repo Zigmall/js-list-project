@@ -1,6 +1,7 @@
 const itemForm = document.getElementById('item-form');
 const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
+const clearButton = document.getElementById('clear');
 
 const addItem = (e) => {
   e.preventDefault();
@@ -20,8 +21,6 @@ const addItem = (e) => {
   itemList.appendChild(li);
   itemInput.value = '';
 };
-//Event Listener
-itemForm.addEventListener('submit', addItem);
 
 const createButton = (classes) => {
   const btn = document.createElement('button');
@@ -31,3 +30,20 @@ const createButton = (classes) => {
   btn.appendChild(icon);
   return btn;
 };
+
+const removeItem = (e) => {
+  if (e.target.parentElement.classList.contains('remove-item')) {
+    e.target.parentElement.parentElement.remove();
+  }
+};
+
+const removeAll = () => {
+  while (itemList.firstChild) {
+    itemList.removeChild(itemList.firstChild);
+  }
+};
+
+//Event Listener
+itemForm.addEventListener('submit', addItem);
+itemList.addEventListener('click', removeItem);
+clearButton.addEventListener('click', removeAll);
