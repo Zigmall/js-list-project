@@ -36,12 +36,20 @@ const createButton = (classes) => {
   return btn;
 };
 
-const removeItem = (e) => {
+const onClickItem = (e) => {
   if (e.target.parentElement.classList.contains('remove-item')) {
-    if (confirm('Are you sure?')) {
-      e.target.parentElement.parentElement.remove();
-    }
+    removeItem(e.target.parentElement.parentElement);
   }
+};
+
+const removeItem = (item) => {
+  //   Remove from DOM
+  if (confirm('Are you sure?')) {
+    item.remove();
+  }
+
+  // Remove from storage
+  removeItemFromLocalStorage(item.textContent);
   checkUI();
 };
 
@@ -50,6 +58,7 @@ const removeAll = () => {
     while (itemList.firstChild) {
       itemList.removeChild(itemList.firstChild);
     }
+    localStorage.clear();
   }
   checkUI();
 };
@@ -104,10 +113,17 @@ const updateItemsFromLocalStorage = () => {
   checkUI();
 };
 
+const removeItemFromLocalStorage = (item) => {
+  const itemsFromLocalStorage = getItemsFromLocalStorage();
+  const newList = itemsFromLocalStorage.filter((element) => element !== item);
+  localStorage.clear();
+  localStorage.setItem('items', JSON.stringify(newList));
+};
+
 // Initialize app
 const init = () => {
   itemForm.addEventListener('submit', onAddItemSubmit);
-  itemList.addEventListener('click', removeItem);
+  itemList.addEventListener('click', onClickItem);
   clearButton.addEventListener('click', removeAll);
   itemFilter.addEventListener('input', filterItems);
   document.addEventListener('DOMContentLoaded', updateItemsFromLocalStorage);
