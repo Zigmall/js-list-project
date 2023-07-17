@@ -10,10 +10,12 @@ const onAddItemSubmit = (e) => {
   e.preventDefault();
 
   const text = itemInput.value;
+
   if (text === '') {
     alert('Please add an item');
     return;
   }
+
   // Check for edit mode
   if (isEditMode) {
     const itemToEdit = itemList.querySelector('.edit-mode');
@@ -22,6 +24,9 @@ const onAddItemSubmit = (e) => {
     itemToEdit.classList.remove('edit-mode');
     itemToEdit.remove();
     isEditMode = false;
+  } else if (checkIfItemExists(text)) {
+    alert(`There is already ${text} on the list`);
+    return;
   }
 
   addItemToDOM(text);
@@ -138,6 +143,11 @@ const updateItemsFromLocalStorage = () => {
     items.forEach((item) => addItemToDOM(item));
   }
   checkUI();
+};
+
+const checkIfItemExists = (item) => {
+  const items = getItemsFromLocalStorage();
+  return items.includes(item);
 };
 
 const removeItemFromLocalStorage = (item) => {
