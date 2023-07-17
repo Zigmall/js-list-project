@@ -3,26 +3,41 @@ const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
 const clearButton = document.getElementById('clear');
 const itemFilter = document.getElementById('filter');
-// const items = itemList.querySelectorAll('li');
 
-const addItem = (e) => {
+const onAddItemSubmit = (e) => {
   e.preventDefault();
 
-  const newItem = itemInput.value;
-  //validate input
-  if (newItem === '') {
+  const text = itemInput.value;
+  if (text === '') {
     alert('Please add an item');
     return;
   }
+  addItemToDOM(text);
+  addItemToLocalStorage(text)
 
-  // Create list item
+  itemInput.value = '';
+  checkUI();
+};
+
+const addItemToDOM = (text) => {
   const li = document.createElement('li');
-  li.appendChild(document.createTextNode(newItem));
+  li.appendChild(document.createTextNode(text));
   const button = createButton('remove-item btn-link text-red');
   li.appendChild(button);
   itemList.appendChild(li);
-  itemInput.value = '';
-  checkUI();
+};
+
+const addItemToLocalStorage = (item) => {
+  let itemsFromLocalStorage;
+
+  if (localStorage.getItem('items') === null) {
+    itemsFromLocalStorage = [];
+  } else {
+    itemsFromLocalStorage = JSON.parse(localStorage.getItem('items'));
+  }
+
+  itemsFromLocalStorage.push(item);
+  localStorage.setItem('items', JSON.stringify(itemsFromLocalStorage));
 };
 
 const createButton = (classes) => {
@@ -44,7 +59,7 @@ const removeItem = (e) => {
 };
 
 const removeAll = () => {
-  if (confirm('Are you sure?')) {
+  if (confirm('Do you wont to delete all items?')) {
     while (itemList.firstChild) {
       itemList.removeChild(itemList.firstChild);
     }
@@ -77,8 +92,9 @@ const filterItems = (e) => {
 };
 
 //Event Listener
-itemForm.addEventListener('submit', addItem);
+itemForm.addEventListener('submit', onAddItemSubmit);
 itemList.addEventListener('click', removeItem);
 clearButton.addEventListener('click', removeAll);
 itemFilter.addEventListener('input', filterItems);
 checkUI();
+// localStorage.clear();
