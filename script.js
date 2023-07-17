@@ -3,15 +3,32 @@ const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
 const clearButton = document.getElementById('clear');
 const itemFilter = document.getElementById('filter');
+const formButton = itemForm.querySelector('button');
+let isEditMode = false;
 
 const onAddItemSubmit = (e) => {
   e.preventDefault();
 
   const text = itemInput.value;
+
   if (text === '') {
     alert('Please add an item');
     return;
   }
+
+  // Check for edit mode
+  if (isEditMode) {
+    const itemToEdit = itemList.querySelector('.edit-mode');
+    console.log(itemToEdit.textContent);
+    removeItemFromLocalStorage(itemToEdit.textContent);
+    itemToEdit.classList.remove('edit-mode');
+    itemToEdit.remove();
+    isEditMode = false;
+  } else if (checkIfItemExists(text)) {
+    alert(`There is already ${text} on the list`);
+    return;
+  }
+
   addItemToDOM(text);
   addItemToLocalStorage(text);
 
@@ -39,16 +56,27 @@ const createButton = (classes) => {
 const onClickItem = (e) => {
   if (e.target.parentElement.classList.contains('remove-item')) {
     removeItem(e.target.parentElement.parentElement);
+  } else {
+    setItemToEdit(e.target);
   }
 };
 
+const setItemToEdit = (item) => {
+  isEditMode = true;
+  itemList.querySelectorAll('li').forEach((i) => i.classList.remove('edit-mode'));
+  item.classList.add('edit-mode');
+  formButton.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item';
+
+  const text = item.textContent;
+  formButton.style.backgroundColor = '#228B22';
+  itemInput.value = text;
+};
+
 const removeItem = (item) => {
-  //   Remove from DOM
   if (confirm('Are you sure?')) {
     item.remove();
   }
 
-  // Remove from storage
   removeItemFromLocalStorage(item.textContent);
   checkUI();
 };
@@ -64,6 +92,7 @@ const removeAll = () => {
 };
 
 const checkUI = () => {
+  itemInput.value = '';
   const items = itemList.querySelectorAll('li');
   if (items.length < 1) {
     clearButton.style.display = 'none';
@@ -72,6 +101,9 @@ const checkUI = () => {
     clearButton.style.display = 'block';
     itemFilter.style.display = 'block';
   }
+  formButton.innerHTML = '<i class="fa-solid fa-plus"></i>Add Item';
+  formButton.style.backgroundColor = '#333';
+  isEditMode = false;
 };
 
 const filterItems = (e) => {
@@ -111,6 +143,11 @@ const updateItemsFromLocalStorage = () => {
     items.forEach((item) => addItemToDOM(item));
   }
   checkUI();
+};
+
+const checkIfItemExists = (item) => {
+  const items = getItemsFromLocalStorage();
+  return items.includes(item);
 };
 
 const removeItemFromLocalStorage = (item) => {
