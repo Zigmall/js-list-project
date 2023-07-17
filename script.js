@@ -13,7 +13,7 @@ const onAddItemSubmit = (e) => {
     return;
   }
   addItemToDOM(text);
-  addItemToLocalStorage(text)
+  addItemToLocalStorage(text);
 
   itemInput.value = '';
   checkUI();
@@ -25,19 +25,6 @@ const addItemToDOM = (text) => {
   const button = createButton('remove-item btn-link text-red');
   li.appendChild(button);
   itemList.appendChild(li);
-};
-
-const addItemToLocalStorage = (item) => {
-  let itemsFromLocalStorage;
-
-  if (localStorage.getItem('items') === null) {
-    itemsFromLocalStorage = [];
-  } else {
-    itemsFromLocalStorage = JSON.parse(localStorage.getItem('items'));
-  }
-
-  itemsFromLocalStorage.push(item);
-  localStorage.setItem('items', JSON.stringify(itemsFromLocalStorage));
 };
 
 const createButton = (classes) => {
@@ -91,10 +78,40 @@ const filterItems = (e) => {
   });
 };
 
-//Event Listener
-itemForm.addEventListener('submit', onAddItemSubmit);
-itemList.addEventListener('click', removeItem);
-clearButton.addEventListener('click', removeAll);
-itemFilter.addEventListener('input', filterItems);
-checkUI();
-// localStorage.clear();
+const addItemToLocalStorage = (item) => {
+  let itemsFromLocalStorage = getItemsFromLocalStorage();
+
+  itemsFromLocalStorage.push(item);
+  localStorage.setItem('items', JSON.stringify(itemsFromLocalStorage));
+};
+
+const getItemsFromLocalStorage = () => {
+  let itemsFromLocalStorage;
+
+  if (localStorage.getItem('items') === null) {
+    itemsFromLocalStorage = [];
+  } else {
+    itemsFromLocalStorage = JSON.parse(localStorage.getItem('items'));
+  }
+  return itemsFromLocalStorage;
+};
+
+const updateItemsFromLocalStorage = () => {
+  const items = getItemsFromLocalStorage();
+  if (items.length !== 0) {
+    items.forEach((item) => addItemToDOM(item));
+  }
+  checkUI();
+};
+
+// Initialize app
+const init = () => {
+  itemForm.addEventListener('submit', onAddItemSubmit);
+  itemList.addEventListener('click', removeItem);
+  clearButton.addEventListener('click', removeAll);
+  itemFilter.addEventListener('input', filterItems);
+  document.addEventListener('DOMContentLoaded', updateItemsFromLocalStorage);
+  checkUI();
+};
+
+init();
